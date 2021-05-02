@@ -9,9 +9,34 @@ import{
     NavItem,
     SearchWrapper,
     NavSearch,
+    SearchInfo,
+    SearchInfoTitle,
+    SearchInfoSwitch,
+    SearchInfoList,
+    SearchInfoItem,
     Addition,
     Button
 } from './style';
+
+const getListArea = (show) => {
+    if(show){
+        return (
+            <SearchInfo>
+                <SearchInfoTitle>
+                    Top Search
+                    <SearchInfoSwitch>换一批</SearchInfoSwitch>
+                </SearchInfoTitle>
+                <SearchInfoList>
+                    <SearchInfoItem>教育</SearchInfoItem>
+                    <SearchInfoItem>简书</SearchInfoItem>
+                    <SearchInfoItem>教育</SearchInfoItem>
+                </SearchInfoList>
+            </SearchInfo>
+        )
+    }else{
+        return null;
+    }
+}
 
 //负责页面上的样式
 const Header = (props) => {
@@ -39,6 +64,7 @@ const Header = (props) => {
                     <span className={props.focused ? 'focused iconfont': 'iconfont'}>
                         &#xe612;
                     </span>
+                    {getListArea(props.focused)}
                 </SearchWrapper>
             </Nav>
             <Addition>
@@ -55,7 +81,7 @@ const Header = (props) => {
 //容器组件负责逻辑和数据
 const mapStateToProps = (state) => {
     return{
-        focused: state.header.focused
+        focused: state.getIn(['header', 'focused'])
     }
 }
 
