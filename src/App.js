@@ -5,6 +5,7 @@ import store from './store';
 import { ReactReduxContext } from 'react-redux';
 
 function App() {
+
   return (
     <Provider store={store}>
       <Header />
