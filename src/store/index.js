@@ -1,3 +1,4 @@
+//创建store的代码
 import { compose, createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import reducer from './reducer';

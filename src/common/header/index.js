@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { CSSTransition} from 'react-transition-group'
 import {actionCreators} from './store';
+import { ImSpinner11, ImPen } from "react-icons/im";
+import { BsSearch } from "react-icons/bs";
 import{
     HeaderWrapper,
     Logo,
@@ -21,19 +23,32 @@ import{
 //负责页面上的样式
 class Header extends Component{
     getListArea(){
-        if(this.props.focused){
+        const{ focused, list, page, totalPage, mouseIn, handleMouseEnter, handleMouseLeave, handleChangePage } = this.props;
+        const newList = list.toJS();
+        const pageList = [];
+
+        if(newList.length){
+            for(let i = (page - 1) * 10; i < page * 10; i++){
+                pageList.push(
+                    <SearchInfoItem key={newList[i]}>{newList[i]}</SearchInfoItem>
+                )
+            }
+        }
+
+        if(focused || mouseIn){
             return (
-                <SearchInfo>
+                <SearchInfo 
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
                     <SearchInfoTitle>
                         Top Search
-                        <SearchInfoSwitch>change suggestion</SearchInfoSwitch>
+                        <SearchInfoSwitch onClick={() => handleChangePage(page, totalPage, this.spinIcon)}>
+                            <ImSpinner11 className="iconfont spin"/>
+                        </SearchInfoSwitch>
                     </SearchInfoTitle>
                     <SearchInfoList>
-                        {
-                            this.props.list.map((item) => {
-                                return <SearchInfoItem key={item}>{item}</SearchInfoItem>
-                            })
-                        }
+                        {pageList}
                     </SearchInfoList>
                 </SearchInfo>
             )
@@ -43,6 +58,7 @@ class Header extends Component{
     }
 
     render(){
+        const { focused, handleInputFocus, handleInputBlur, list} = this.props;
         return(
             <HeaderWrapper>
                 <Logo />
@@ -53,26 +69,24 @@ class Header extends Component{
                     <NavItem className='right'>Aa</NavItem>
                     <SearchWrapper>
                         <CSSTransition
-                            in={this.props.focused}
+                            in={focused}
                             timeout={200}
                             classNames="slide"
                         >
                         <NavSearch 
-                            className={this.props.focused ? 'focused': ''}
-                            onFocus ={this.props.handleInputFocus}
-                            onBlur={this.props.handleInputBlur}
+                            className={focused ? 'focused': ''}
+                            onFocus ={() => handleInputFocus(list)}
+                            onBlur={handleInputBlur}
                         >
                         </NavSearch>
                         </CSSTransition>
-                        <span className={this.props.focused ? 'focused iconfont': 'iconfont'}>
-                            &#xe612;
-                        </span>
+                        <BsSearch className={focused ? 'focused iconfont zoom': 'iconfont zoom'} />
                         {this.getListArea()}
                     </SearchWrapper>
                 </Nav>
                 <Addition>
                     <Button className='writting'>
-                        <span className="iconfont">&#xe615;</span>
+                        <ImPen className="iconfont pen" />
                         compose
                     </Button>
                     <Button className='reg'>sign up</Button>
@@ -86,22 +100,36 @@ class Header extends Component{
 const mapStateToProps = (state) => {
 return{
     focused: state.getIn(['header', 'focused']),
-    list: state.getIn(['header', 'list'])
+    list: state.getIn(['header', 'list']),
+    page: state.getIn(['header', 'page']),
+    totalPage: state.getIn(['header', 'totalPage']),
+    mouseIn: state.getIn(['header', 'mouseIn'])
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return{
-        handleInputFocus(){
-            dispatch(actionCreators.getList());
+        handleInputFocus(list){
+            (list.size === 0) && dispatch(actionCreators.getList());
             dispatch(actionCreators.searchFocus());
         },
         handleInputBlur(){
             dispatch(actionCreators.searchBlur());
+        },
+        handleMouseEnter(){
+            dispatch(actionCreators.mouseEnter());
+        },
+        handleMouseLeave(){
+            dispatch(actionCreators.mouseLeave());
+        },
+        handleChangePage(page, totalPage){
+            if(page < totalPage){
+                dispatch(actionCreators.changePage(page + 1));
+            } else {
+                dispatch(actionCreators.changePage(1));
+            }
         }
     }
 }
-
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(Header);
