@@ -1,23 +1,40 @@
 import { fromJS } from 'immutable';
+import * as constants from './constants';
 
 
 //immutable对象
 
 const defaultState = fromJS({
-    topicList: [{
-        id: 1,
-        title: '社会热点',
-        imgUrl: 'https://upload.jianshu.io/collections/images/4/sy_20091020135145113016.jpg?imageMogr2/auto-orient/strip|imageView2/1/w/120/h/120/format/webp'
-    },{
-        id: 2,
-        title: '手绘',
-        imgUrl: 'https://upload.jianshu.io/collections/images/283250/%E6%BC%AB%E7%94%BB%E4%B8%93%E9%A2%98.jpg?imageMogr2/auto-orient/strip|imageView2/1/w/240/h/240/format/webp'
-    }]
+    topicList: [],
+    articleList: [], 
+    recommendList: [],
+    articlePage: 1,
+    showScroll: false
 });
+
+const changeHomeData = (state, action) => {
+    return state.merge({
+        topicList: fromJS(action.topicList),
+        articleList: fromJS(action.articleList),
+        recommendList: fromJS(action.recommendList)
+    });
+}
+
+const addHomeList = (state, action) => {
+    return state.merge({
+        'articleList': state.get('articleList').concat(action.list),
+        'articlePage': action.nextPage
+    });
+}
 
 export default (state = defaultState, action) => {
     switch(action.type){
-        
+        case constants.CHANGE_HOME_DATA:
+            return changeHomeData(state, action);
+        case constants.ADD_HOME_LIST:
+            return addHomeList(state, action);
+        case constants.TOGGLE_SCROLL_TOP:
+        return state.set('showScroll', action.show)
         default:
             return state;
     }
