@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { CSSTransition} from 'react-transition-group'
 import {actionCreators} from './store';
 import { ImSpinner11, ImPen } from "react-icons/im";
 import { BsSearch } from "react-icons/bs";
+import { actionCreators as loginActionCreators } from '../../pages/login/store';
 import{
     HeaderWrapper,
     Logo,
@@ -58,14 +60,20 @@ class Header extends Component{
     }
 
     render(){
-        const { focused, handleInputFocus, handleInputBlur, list} = this.props;
+        const { focused, handleInputFocus, handleInputBlur, list, login, logout} = this.props;
         return(
             <HeaderWrapper>
+                <Link to='/'>
                 <Logo />
+                </Link>
                 <Nav>
                     <NavItem className='left active'>Homepage</NavItem>
                     <NavItem className='left'>download App</NavItem>
-                    <NavItem className='right'>Login</NavItem>
+                    {
+                        login ? 
+                        <NavItem onClick={logout} className='right'>log out</NavItem> : 
+                        <Link to='/login'><NavItem className='right'>Login</NavItem></Link>
+                    }
                     <NavItem className='right'>Aa</NavItem>
                     <SearchWrapper>
                         <CSSTransition
@@ -85,10 +93,12 @@ class Header extends Component{
                     </SearchWrapper>
                 </Nav>
                 <Addition>
-                    <Button className='writting'>
-                        <ImPen className="iconfont pen" />
-                        compose
-                    </Button>
+                    <Link to='/write'>
+                        <Button className='writting'>
+                            <ImPen className="iconfont pen" />
+                            compose
+                        </Button>
+                    </Link>
                     <Button className='reg'>sign up</Button>
                 </Addition>
             </HeaderWrapper>
@@ -103,7 +113,8 @@ return{
     list: state.getIn(['header', 'list']),
     page: state.getIn(['header', 'page']),
     totalPage: state.getIn(['header', 'totalPage']),
-    mouseIn: state.getIn(['header', 'mouseIn'])
+    mouseIn: state.getIn(['header', 'mouseIn']),
+    login: state.getIn(['login', 'login'])
     }
 }
 
@@ -128,7 +139,11 @@ const mapDispatchToProps = (dispatch) => {
             } else {
                 dispatch(actionCreators.changePage(1));
             }
+        },
+        logout() {
+            dispatch(loginActionCreators.logout())
         }
+
     }
 }
 
